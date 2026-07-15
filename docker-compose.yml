@@ -1,0 +1,11 @@
+services:
+  patient-db:
+    image: mysql:8
+    container_name: patient-db
+    environment:
+      MYSQL_DATABASE: patient_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3307:3306"
