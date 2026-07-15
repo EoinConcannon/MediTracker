@@ -1,4 +1,4 @@
-package com.meditracker.patient_service;
+package com.meditracker.patientservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
