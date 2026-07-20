@@ -5,7 +5,8 @@ import { useAuth } from '../context/AuthContext';
 import { PATIENT_SERVICE_URL } from '../config';
 
 export default function Login() {
-    const [userId, setUserId] = useState('');
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
     const [role, setRole] = useState('PATIENT');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
@@ -17,9 +18,8 @@ export default function Login() {
         e.preventDefault();
         setError('');
 
-        // Validate empty field
-        if (!userId.trim()) {
-            setError('Please enter your ID');
+        if (!email.trim() || !password.trim()) {
+            setError('Please enter your email and password');
             return;
         }
 
@@ -29,16 +29,17 @@ export default function Login() {
             let response;
 
             if (role === 'PATIENT') {
-                response = await axios.get(
-                    `${PATIENT_SERVICE_URL}/api/patients/${userId}`
+                response = await axios.post(
+                    `${PATIENT_SERVICE_URL}/api/patients/login`,
+                    { email, password }
                 );
             } else {
-                response = await axios.get(
-                    `${PATIENT_SERVICE_URL}/api/doctors/${userId}`
+                response = await axios.post(
+                    `${PATIENT_SERVICE_URL}/api/doctors/login`,
+                    { email, password }
                 );
             }
 
-            // Store user in AuthContext
             login({
                 id: response.data.id,
                 name: response.data.name,
@@ -46,7 +47,6 @@ export default function Login() {
                 data: response.data
             });
 
-            // Redirect based on role
             if (role === 'PATIENT') {
                 navigate('/patient-dashboard');
             } else {
@@ -55,7 +55,9 @@ export default function Login() {
 
         } catch (err) {
             if (err.response && err.response.status === 404) {
-                setError('No account found with that ID');
+                setError('No account found with that email address');
+            } else if (err.response && err.response.status === 401) {
+                setError('Incorrect password');
             } else {
                 setError('Something went wrong, please try again');
             }
@@ -65,9 +67,9 @@ export default function Login() {
     };
 
     return (
-        <div className="d-flex justify-content-center 
+        <div className="d-flex justify-content-center
                         align-items-center vh-100">
-            <div className="card shadow p-4" style={{ width: '400px' }}>
+            <div className="card shadow p-4" style={{ width: '420px' }}>
                 <h3 className="text-center mb-4 text-primary fw-bold">
                     MediTracker
                 </h3>
@@ -85,16 +87,24 @@ export default function Login() {
                     </div>
 
                     <div className="mb-3">
-                        <label className="form-label">
-                            {role === 'PATIENT' ? 'Patient ID' : 'Doctor ID'}
-                        </label>
+                        <label className="form-label">Email</label>
                         <input
-                            type="number"
+                            type="email"
                             className="form-control"
-                            placeholder={`Enter your ${role === 'PATIENT'
-                                ? 'patient' : 'doctor'} ID`}
-                            value={userId}
-                            onChange={(e) => setUserId(e.target.value)}
+                            placeholder="Enter your email"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                        />
+                    </div>
+
+                    <div className="mb-3">
+                        <label className="form-label">Password</label>
+                        <input
+                            type="password"
+                            className="form-control"
+                            placeholder="Enter your password"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
 

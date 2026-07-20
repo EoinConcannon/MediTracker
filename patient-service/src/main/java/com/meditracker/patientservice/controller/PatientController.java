@@ -1,5 +1,6 @@
 package com.meditracker.patientservice.controller;
 
+import com.meditracker.patientservice.dto.LoginRequest;
 import com.meditracker.patientservice.model.Patient;
 import com.meditracker.patientservice.service.PatientService;
 import jakarta.validation.Valid;
@@ -35,5 +36,12 @@ public class PatientController {
 	@GetMapping
 	public ResponseEntity<List<Patient>> getPatientsByDoctorId(@RequestParam Long doctorId) {
 		return ResponseEntity.ok(patientService.getPatientsByDoctorId(doctorId));
+	}
+
+	// POST /api/patients/login
+	@PostMapping("/login")
+	public ResponseEntity<Patient> loginPatient(@RequestBody LoginRequest loginRequest) {
+		Patient patient = patientService.loginPatient(loginRequest.getEmail(), loginRequest.getPassword());
+		return ResponseEntity.ok(patient);
 	}
 }

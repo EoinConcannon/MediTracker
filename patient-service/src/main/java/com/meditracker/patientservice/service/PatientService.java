@@ -1,6 +1,7 @@
 package com.meditracker.patientservice.service;
 
 import com.meditracker.patientservice.exception.DuplicateEmailException;
+import com.meditracker.patientservice.exception.InvalidCredentialsException;
 import com.meditracker.patientservice.exception.ResourceNotFoundException;
 import com.meditracker.patientservice.model.Patient;
 import com.meditracker.patientservice.repository.DoctorRepository;
@@ -30,6 +31,17 @@ public class PatientService {
 		}
 
 		return patientRepository.save(patient);
+	}
+
+	public Patient loginPatient(String email, String password) {
+		Patient patient = patientRepository.findByEmail(email)
+				.orElseThrow(() -> new ResourceNotFoundException("No account found with that email address"));
+
+		if (!patient.getPassword().equals(password)) {
+			throw new InvalidCredentialsException("Incorrect password");
+		}
+
+		return patient;
 	}
 
 	public Patient getPatientById(Long id) {
