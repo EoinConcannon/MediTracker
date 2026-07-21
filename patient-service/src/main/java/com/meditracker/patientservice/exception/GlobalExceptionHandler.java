@@ -42,4 +42,11 @@ public class GlobalExceptionHandler {
 		error.put("error", ex.getMessage());
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(error);
 	}
+
+	@ExceptionHandler(UnauthorisedAccessException.class)
+	public ResponseEntity<Map<String, String>> handleUnauthorisedAccess(UnauthorisedAccessException ex) {
+		Map<String, String> error = new HashMap<>();
+		error.put("error", ex.getMessage());
+		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(error);
+	}
 }

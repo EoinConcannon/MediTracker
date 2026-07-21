@@ -3,6 +3,7 @@ package com.meditracker.patientservice.service;
 import com.meditracker.patientservice.exception.DuplicateEmailException;
 import com.meditracker.patientservice.exception.InvalidCredentialsException;
 import com.meditracker.patientservice.exception.ResourceNotFoundException;
+import com.meditracker.patientservice.exception.UnauthorisedAccessException;
 import com.meditracker.patientservice.model.Patient;
 import com.meditracker.patientservice.repository.DoctorRepository;
 import com.meditracker.patientservice.repository.PatientRepository;
@@ -51,5 +52,16 @@ public class PatientService {
 
 	public List<Patient> getPatientsByDoctorId(Long doctorId) {
 		return patientRepository.findByAssignedDoctorId(doctorId);
+	}
+
+	public Patient getPatientByIdForDoctor(Long patientId, Long doctorId) {
+		Patient patient = patientRepository.findById(patientId)
+				.orElseThrow(() -> new ResourceNotFoundException("Patient not found with id: " + patientId));
+
+		if (!patient.getAssignedDoctorId().equals(doctorId)) {
+			throw new UnauthorisedAccessException("You are not authorised to view this patient");
+		}
+
+		return patient;
 	}
 }

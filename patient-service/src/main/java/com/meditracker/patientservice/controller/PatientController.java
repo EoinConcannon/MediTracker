@@ -25,11 +25,16 @@ public class PatientController {
 		return ResponseEntity.status(HttpStatus.CREATED).body(saved);
 	}
 
-	// GET /api/patients/{id} — get patient by ID
+	// GET /api/patients/{id} — get patient by ID (with optional doctor auth check)
 	@GetMapping("/{id}")
-	public ResponseEntity<Patient> getPatientById(@PathVariable Long id) {
-		Patient patient = patientService.getPatientById(id);
-		return ResponseEntity.ok(patient);
+	public ResponseEntity<Patient> getPatientById(@PathVariable Long id,
+			@RequestParam(required = false) Long doctorId) {
+
+		if (doctorId != null) {
+			return ResponseEntity.ok(patientService.getPatientByIdForDoctor(id, doctorId));
+		}
+
+		return ResponseEntity.ok(patientService.getPatientById(id));
 	}
 
 	// GET /api/patients?doctorId=1 — get all patients for a doctor
