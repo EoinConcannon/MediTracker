@@ -2,6 +2,7 @@ package com.meditracker.patientservice;
 
 import com.meditracker.patientservice.exception.DuplicateEmailException;
 import com.meditracker.patientservice.exception.ResourceNotFoundException;
+import com.meditracker.patientservice.exception.UnauthorisedAccessException;
 import com.meditracker.patientservice.model.Doctor;
 import com.meditracker.patientservice.model.Patient;
 import com.meditracker.patientservice.repository.DoctorRepository;
@@ -83,5 +84,35 @@ public class PatientServiceTest {
 		when(patientRepository.findById(999L)).thenReturn(Optional.empty());
 
 		assertThrows(ResourceNotFoundException.class, () -> patientService.getPatientById(999L));
+	}
+
+	@Test
+	void getPatientByIdForDoctor_Success() {
+		Patient patient = buildPatient();
+		patient.setAssignedDoctorId(1L);
+
+		when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
+
+		Patient result = patientService.getPatientByIdForDoctor(1L, 1L);
+
+		assertNotNull(result);
+		assertEquals("John Murphy", result.getName());
+	}
+
+	@Test
+	void getPatientByIdForDoctor_WrongDoctor_ThrowsException() {
+		Patient patient = buildPatient();
+		patient.setAssignedDoctorId(1L);
+
+		when(patientRepository.findById(1L)).thenReturn(Optional.of(patient));
+
+		assertThrows(UnauthorisedAccessException.class, () -> patientService.getPatientByIdForDoctor(1L, 2L));
+	}
+
+	@Test
+	void getPatientByIdForDoctor_PatientNotFound_ThrowsException() {
+		when(patientRepository.findById(999L)).thenReturn(Optional.empty());
+
+		assertThrows(ResourceNotFoundException.class, () -> patientService.getPatientByIdForDoctor(999L, 1L));
 	}
 }
