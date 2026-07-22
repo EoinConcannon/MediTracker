@@ -1,4 +1,4 @@
-package com.meditracker.vitals_service;
+package com.meditracker.vitalsservice;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

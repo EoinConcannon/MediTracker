@@ -1,4 +1,4 @@
-package com.meditracker.vitals_service;
+package com.meditracker.vitalsservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
