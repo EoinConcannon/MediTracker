@@ -5,6 +5,7 @@ import Login from './pages/Login';
 import PatientDashboard from './pages/PatientDashboard';
 import DoctorDashboard from './pages/DoctorDashboard';
 import PatientProfile from './pages/PatientProfile';
+import SubmitVitals from './pages/SubmitVitals';
 
 export default function App() {
   return (
@@ -33,6 +34,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <PatientProfile />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/submit-vitals"
+            element={
+              <ProtectedRoute>
+                <SubmitVitals />
               </ProtectedRoute>
             }
           />
