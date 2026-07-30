@@ -9,12 +9,6 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3307:3306"
-    healthcheck:
-      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u root -proot -e 'SELECT 1' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
 
   vitals-db:
     image: mysql:8
@@ -26,12 +20,6 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3308:3306"
-    healthcheck:
-      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u root -proot -e 'SELECT 1' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
 
   notification-db:
     image: mysql:8
@@ -43,22 +31,16 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3309:3306"
-    healthcheck:
-      test: ["CMD-SHELL", "mysql -h 127.0.0.1 -u root -proot -e 'SELECT 1' || exit 1"]
-      interval: 30s
-      timeout: 10s
-      retries: 10
-      start_period: 120s
 
   zookeeper:
-    image: confluentinc/cp-zookeeper:7.4.0
+    image: confluentinc/cp-zookeeper:7.9.0
     container_name: zookeeper
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
 
   kafka:
-    image: confluentinc/cp-kafka:7.4.0
+    image: confluentinc/cp-kafka:7.9.0
     container_name: kafka
     depends_on:
       - zookeeper
@@ -74,12 +56,7 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
-    healthcheck:
-      test: ["CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092"]
-      interval: 15s
-      timeout: 10s
-      retries: 10
-      start_period: 30s
+    restart: on-failure
 
   patient-service:
     build: ./patient-service
@@ -89,11 +66,6 @@ services:
     depends_on:
       - patient-db
     restart: on-failure
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://patient-db:3306/patient_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_JPA_PROPERTIES_HIBERNATE_DIALECT: org.hibernate.dialect.MySQLDialect
 
   vitals-service:
     build: ./vitals-service
@@ -105,12 +77,6 @@ services:
       - kafka
       - patient-service
     restart: on-failure
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://vitals-db:3306/vitals_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_KAFKA_PRODUCER_BOOTSTRAP_SERVERS: kafka:9093
-      PATIENT_SERVICE_URL: http://patient-service:8081
 
   notification-service:
     build: ./notification-service
@@ -121,8 +87,3 @@ services:
       - notification-db
       - kafka
     restart: on-failure
-    environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://notification-db:3306/notification_db
-      SPRING_DATASOURCE_USERNAME: user
-      SPRING_DATASOURCE_PASSWORD: password
-      SPRING_KAFKA_CONSUMER_BOOTSTRAP_SERVERS: kafka:9093
