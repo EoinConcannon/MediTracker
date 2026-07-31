@@ -32,6 +32,17 @@ services:
     ports:
       - "3309:3306"
 
+  appointment-db:
+    image: mysql:8
+    container_name: appointment-db
+    environment:
+      MYSQL_DATABASE: appointment_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3310:3306"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.9.0
     container_name: zookeeper
@@ -86,4 +97,13 @@ services:
     depends_on:
       - notification-db
       - kafka
+    restart: on-failure
+
+  appointment-service:
+    build: ./appointment-service
+    container_name: appointment-service
+    ports:
+      - "8082:8082"
+    depends_on:
+      - appointment-db
     restart: on-failure
