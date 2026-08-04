@@ -43,6 +43,17 @@ services:
     ports:
       - "3310:3306"
 
+  medication-db:
+    image: mysql:8
+    container_name: medication-db
+    environment:
+      MYSQL_DATABASE: medication_db
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3311:3306"
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.9.0
     container_name: zookeeper
@@ -106,4 +117,13 @@ services:
       - "8082:8082"
     depends_on:
       - appointment-db
+    restart: on-failure
+
+  medication-service:
+    build: ./medication-service
+    container_name: medication-service
+    ports:
+      - "8083:8083"
+    depends_on:
+      - medication-db
     restart: on-failure
