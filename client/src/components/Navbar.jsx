@@ -69,6 +69,13 @@ export default function Navbar() {
                                     onClick={() => navigate('/notifications')}>
                                     Notifications
                                 </span>
+                                <span
+                                    className={`nav-link ${isActive('/issue-prescription')
+                                        ? 'active fw-bold' : ''}`}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate('/issue-prescription')}>
+                                    Prescriptions
+                                </span>
                             </>
                         )}
                     </div>

@@ -95,6 +95,21 @@ export default function DoctorDashboard() {
                             </div>
                         </div>
                     </div>
+                    <div className="col-md-4 mb-3">
+                        <div className="card h-100 shadow-sm">
+                            <div className="card-body">
+                                <h5 className="card-title">Issue Prescription</h5>
+                                <p className="card-text text-muted">
+                                    Issue a new prescription for a patient
+                                </p>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => navigate('/issue-prescription')}>
+                                    Issue Prescription
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </>
