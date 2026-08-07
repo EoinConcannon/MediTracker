@@ -2,17 +2,21 @@ services:
   patient-db:
     image: mysql:8
     container_name: patient-db
+    mem_limit: 256m
     environment:
       MYSQL_DATABASE: patient_db
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: user
       MYSQL_PASSWORD: password
+      MYSQL_INNODB_BUFFER_POOL_SIZE: 64M
     ports:
       - "3307:3306"
+    command: --innodb-buffer-pool-size=64M --innodb-log-file-size=32M
 
   vitals-db:
     image: mysql:8
     container_name: vitals-db
+    mem_limit: 256m
     environment:
       MYSQL_DATABASE: vitals_db
       MYSQL_ROOT_PASSWORD: root
@@ -20,10 +24,12 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3308:3306"
+    command: --innodb-buffer-pool-size=64M --innodb-log-file-size=32M
 
   notification-db:
     image: mysql:8
     container_name: notification-db
+    mem_limit: 256m
     environment:
       MYSQL_DATABASE: notification_db
       MYSQL_ROOT_PASSWORD: root
@@ -31,10 +37,12 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3309:3306"
+    command: --innodb-buffer-pool-size=64M --innodb-log-file-size=32M
 
   appointment-db:
     image: mysql:8
     container_name: appointment-db
+    mem_limit: 256m
     environment:
       MYSQL_DATABASE: appointment_db
       MYSQL_ROOT_PASSWORD: root
@@ -42,10 +50,12 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3310:3306"
+    command: --innodb-buffer-pool-size=64M --innodb-log-file-size=32M
 
   medication-db:
     image: mysql:8
     container_name: medication-db
+    mem_limit: 256m
     environment:
       MYSQL_DATABASE: medication_db
       MYSQL_ROOT_PASSWORD: root
@@ -53,17 +63,21 @@ services:
       MYSQL_PASSWORD: password
     ports:
       - "3311:3306"
+    command: --innodb-buffer-pool-size=64M --innodb-log-file-size=32M
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.9.0
     container_name: zookeeper
+    mem_limit: 256m
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
+      KAFKA_HEAP_OPTS: "-Xmx128m -Xms64m"
 
   kafka:
     image: confluentinc/cp-kafka:7.9.0
     container_name: kafka
+    mem_limit: 512m
     depends_on:
       - zookeeper
     ports:
@@ -78,20 +92,25 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
+      KAFKA_HEAP_OPTS: "-Xmx256m -Xms128m"
     restart: on-failure
 
   patient-service:
     build: ./patient-service
     container_name: patient-service
+    mem_limit: 256m
     ports:
       - "8081:8081"
     depends_on:
       - patient-db
     restart: on-failure
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xmx128m -Xms64m"
 
   vitals-service:
     build: ./vitals-service
     container_name: vitals-service
+    mem_limit: 256m
     ports:
       - "8084:8084"
     depends_on:
@@ -99,31 +118,42 @@ services:
       - kafka
       - patient-service
     restart: on-failure
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xmx128m -Xms64m"
 
   notification-service:
     build: ./notification-service
     container_name: notification-service
+    mem_limit: 256m
     ports:
       - "8085:8085"
     depends_on:
       - notification-db
       - kafka
     restart: on-failure
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xmx128m -Xms64m"
 
   appointment-service:
     build: ./appointment-service
     container_name: appointment-service
+    mem_limit: 256m
     ports:
       - "8082:8082"
     depends_on:
       - appointment-db
     restart: on-failure
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xmx128m -Xms64m"
 
   medication-service:
     build: ./medication-service
     container_name: medication-service
+    mem_limit: 256m
     ports:
       - "8083:8083"
     depends_on:
       - medication-db
     restart: on-failure
+    environment:
+      JAVA_TOOL_OPTIONS: "-Xmx128m -Xms64m"
