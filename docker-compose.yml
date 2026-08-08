@@ -8,7 +8,6 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_USER: user
       MYSQL_PASSWORD: password
-      MYSQL_INNODB_BUFFER_POOL_SIZE: 64M
     ports:
       - "3307:3306"
     command: --innodb-buffer-pool-size=64M --innodb-log-file-size=32M
@@ -65,36 +64,6 @@ services:
       - "3311:3306"
     command: --innodb-buffer-pool-size=64M --innodb-log-file-size=32M
 
-  zookeeper:
-    image: confluentinc/cp-zookeeper:7.9.0
-    container_name: zookeeper
-    mem_limit: 256m
-    environment:
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-      KAFKA_HEAP_OPTS: "-Xmx128m -Xms64m"
-
-  kafka:
-    image: confluentinc/cp-kafka:7.9.0
-    container_name: kafka
-    mem_limit: 512m
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-      - "9093:9093"
-    environment:
-      KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092,PLAINTEXT_INTERNAL://kafka:9093
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_INTERNAL:PLAINTEXT
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_INTERNAL://0.0.0.0:9093
-      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT_INTERNAL
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_AUTO_CREATE_TOPICS_ENABLE: true
-      KAFKA_HEAP_OPTS: "-Xmx256m -Xms128m"
-    restart: on-failure
-
   patient-service:
     build: ./patient-service
     container_name: patient-service
@@ -115,7 +84,6 @@ services:
       - "8084:8084"
     depends_on:
       - vitals-db
-      - kafka
       - patient-service
     restart: on-failure
     environment:
@@ -129,7 +97,6 @@ services:
       - "8085:8085"
     depends_on:
       - notification-db
-      - kafka
     restart: on-failure
     environment:
       JAVA_TOOL_OPTIONS: "-Xmx128m -Xms64m"
