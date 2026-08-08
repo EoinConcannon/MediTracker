@@ -12,6 +12,7 @@ export default function Appointments() {
     const [showForm, setShowForm] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [formError, setFormError] = useState('');
+    const [filter, setFilter] = useState('ALL');
     const [form, setForm] = useState({
         date: '',
         time: '',
@@ -67,9 +68,10 @@ export default function Appointments() {
     };
 
     const handleCancel = async (id) => {
-        if (!window.confirm('Are you sure you want to cancel this appointment?')) {
-            return;
-        }
+        if (!window.confirm(
+            'Are you sure you want to cancel this appointment?'
+        )) return;
+
         try {
             await axios.patch(
                 `${APPOINTMENT_SERVICE_URL}/api/appointments/${id}/cancel`
@@ -98,16 +100,43 @@ export default function Appointments() {
         );
     };
 
+    const today = new Date().toISOString().split('T')[0];
+
+    const filteredAppointments = appointments
+        .filter(a => {
+            if (filter === 'UPCOMING') {
+                return a.status === 'SCHEDULED' && a.date >= today;
+            }
+            if (filter === 'SCHEDULED') {
+                return a.status === 'SCHEDULED';
+            }
+            if (filter === 'CANCELLED') {
+                return a.status === 'CANCELLED';
+            }
+            return true;
+        })
+        .sort((a, b) => {
+            if (filter === 'UPCOMING') {
+                return new Date(a.date) - new Date(b.date);
+            }
+            return new Date(b.date) - new Date(a.date);
+        });
+
     return (
         <>
             <Navbar />
             <div className="container mt-4">
+
+                {/* Header */}
                 <div className="d-flex justify-content-between
                                 align-items-center mb-4">
-                    <h2>My Appointments</h2>
+                    <h2>Appointments</h2>
                     <button
                         className="btn btn-primary"
-                        onClick={() => setShowForm(!showForm)}>
+                        onClick={() => {
+                            setShowForm(!showForm);
+                            setFormError('');
+                        }}>
                         {showForm ? 'Cancel' : '+ Book Appointment'}
                     </button>
                 </div>
@@ -122,28 +151,32 @@ export default function Appointments() {
                             <form onSubmit={handleBook}>
                                 <div className="row">
                                     <div className="col-md-6 mb-3">
-                                        <label className="form-label">Date</label>
+                                        <label className="form-label">
+                                            Date
+                                        </label>
                                         <input
                                             type="date"
                                             className="form-control"
                                             value={form.date}
-                                            min={new Date()
-                                                .toISOString()
-                                                .split('T')[0]}
+                                            min={today}
                                             onChange={e => setForm({
-                                                ...form, date: e.target.value
+                                                ...form,
+                                                date: e.target.value
                                             })}
                                             required
                                         />
                                     </div>
                                     <div className="col-md-6 mb-3">
-                                        <label className="form-label">Time</label>
+                                        <label className="form-label">
+                                            Time
+                                        </label>
                                         <input
                                             type="time"
                                             className="form-control"
                                             value={form.time}
                                             onChange={e => setForm({
-                                                ...form, time: e.target.value
+                                                ...form,
+                                                time: e.target.value
                                             })}
                                             required
                                         />
@@ -158,7 +191,8 @@ export default function Appointments() {
                                         rows="2"
                                         value={form.notes}
                                         onChange={e => setForm({
-                                            ...form, notes: e.target.value
+                                            ...form,
+                                            notes: e.target.value
                                         })}
                                     />
                                 </div>
@@ -171,54 +205,89 @@ export default function Appointments() {
                                     type="submit"
                                     className="btn btn-primary"
                                     disabled={submitting}>
-                                    {submitting ? 'Booking...' : 'Confirm Booking'}
+                                    {submitting
+                                        ? 'Booking...'
+                                        : 'Confirm Booking'}
                                 </button>
                             </form>
                         </div>
                     </div>
                 )}
 
-                {loading && <p className="text-muted">Loading...</p>}
-                {error && <div className="alert alert-danger">{error}</div>}
-
-                {!loading && appointments.length === 0 && (
-                    <div className="alert alert-info">
-                        No appointments yet. Book your first one above.
+                {/* Filter tabs */}
+                {!loading && appointments.length > 0 && (
+                    <div className="btn-group mb-4" role="group">
+                        {['ALL', 'UPCOMING', 'SCHEDULED', 'CANCELLED'].map(
+                            f => (
+                                <button
+                                    key={f}
+                                    type="button"
+                                    className={`btn btn-sm ${filter === f
+                                        ? 'btn-primary'
+                                        : 'btn-outline-primary'
+                                        }`}
+                                    onClick={() => setFilter(f)}>
+                                    {f === 'ALL'
+                                        ? 'All'
+                                        : f === 'UPCOMING'
+                                            ? 'Upcoming'
+                                            : f === 'SCHEDULED'
+                                                ? 'Scheduled'
+                                                : 'Cancelled'}
+                                </button>
+                            )
+                        )}
                     </div>
                 )}
 
-                {appointments
-                    .sort((a, b) => new Date(b.date) - new Date(a.date))
-                    .map(appointment => (
-                        <div key={appointment.id}
-                            className="card mb-3 shadow-sm">
-                            <div className="card-body">
-                                <div className="d-flex justify-content-between
+                {loading && (
+                    <p className="text-muted">Loading appointments...</p>
+                )}
+                {error && (
+                    <div className="alert alert-danger">{error}</div>
+                )}
+
+                {!loading && filteredAppointments.length === 0 && (
+                    <div className="alert alert-info">
+                        {filter === 'ALL'
+                            ? 'No appointments yet. Book your first one above.'
+                            : `No ${filter.toLowerCase()} appointments found.`}
+                    </div>
+                )}
+
+                {filteredAppointments.map(appointment => (
+                    <div
+                        key={appointment.id}
+                        className="card mb-3 shadow-sm">
+                        <div className="card-body">
+                            <div className="d-flex justify-content-between
                                             align-items-start">
-                                    <div>
-                                        <h5 className="mb-1">
-                                            {appointment.date} at {appointment.time}
-                                        </h5>
-                                        {appointment.notes && (
-                                            <p className="text-muted mb-1">
-                                                {appointment.notes}
-                                            </p>
-                                        )}
+                                <div>
+                                    <h5 className="mb-1">
+                                        {appointment.date} at {appointment.time}
+                                    </h5>
+                                    {appointment.notes && (
+                                        <p className="text-muted mb-1">
+                                            {appointment.notes}
+                                        </p>
+                                    )}
+                                    <div className="mt-1">
                                         {statusBadge(appointment.status)}
                                     </div>
-                                    {appointment.status === 'SCHEDULED' && (
-                                        <button
-                                            className="btn btn-outline-danger btn-sm"
-                                            onClick={() =>
-                                                handleCancel(appointment.id)
-                                            }>
-                                            Cancel
-                                        </button>
-                                    )}
                                 </div>
+                                {appointment.status === 'SCHEDULED' && (
+                                    <button
+                                        className="btn btn-outline-danger btn-sm"
+                                        onClick={() =>
+                                            handleCancel(appointment.id)
+                                        }>
+                                        Cancel
+                                    </button>
+                                )}
                             </div>
                         </div>
-                    ))}
+                    </div>
+                ))}
             </div>
         </>
     );
