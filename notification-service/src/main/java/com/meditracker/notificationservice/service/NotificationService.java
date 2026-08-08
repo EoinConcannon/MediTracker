@@ -22,6 +22,10 @@ public class NotificationService {
 		return notificationRepository.findByDoctorIdAndStatus(doctorId, NotificationStatus.UNREAD);
 	}
 
+	public Notification saveNotification(Notification notification) {
+		return notificationRepository.save(notification);
+	}
+
 	public Notification markAsRead(Long notificationId) {
 		Notification notification = notificationRepository.findById(notificationId)
 				.orElseThrow(() -> new RuntimeException("Notification not found with id: " + notificationId));
