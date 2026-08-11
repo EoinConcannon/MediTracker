@@ -59,6 +59,21 @@ export default function PatientDashboard() {
                             </div>
                         </div>
                     </div>
+                    <div className="col-md-4 mb-3">
+                        <div className="card h-100 shadow-sm">
+                            <div className="card-body">
+                                <h5 className="card-title">Vital History</h5>
+                                <p className="card-text text-muted">
+                                    View all your past vital readings
+                                </p>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => navigate('/vital-history')}>
+                                    View History
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </>

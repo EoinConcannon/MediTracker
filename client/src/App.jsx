@@ -10,6 +10,7 @@ import Notifications from './pages/Notifications';
 import Appointments from './pages/Appointments';
 import IssuePrescription from './pages/IssuePrescription';
 import Prescriptions from './pages/Prescriptions';
+import VitalHistory from './pages/VitalHistory';
 
 export default function App() {
   return (
@@ -78,6 +79,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <Prescriptions />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/vital-history"
+            element={
+              <ProtectedRoute>
+                <VitalHistory />
               </ProtectedRoute>
             }
           />

@@ -60,6 +60,13 @@ export default function Navbar() {
                                     onClick={() => navigate('/prescriptions')}>
                                     Prescriptions
                                 </span>
+                                <span
+                                    className={`nav-link ${isActive('/vital-history')
+                                        ? 'active fw-bold' : ''}`}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate('/vital-history')}>
+                                    Vital History
+                                </span>
                             </>
                         )}
                         {user.role === 'DOCTOR' && (
