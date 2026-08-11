@@ -53,6 +53,13 @@ export default function Navbar() {
                                     onClick={() => navigate('/appointments')}>
                                     Appointments
                                 </span>
+                                <span
+                                    className={`nav-link ${isActive('/prescriptions')
+                                        ? 'active fw-bold' : ''}`}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate('/prescriptions')}>
+                                    Prescriptions
+                                </span>
                             </>
                         )}
                         {user.role === 'DOCTOR' && (

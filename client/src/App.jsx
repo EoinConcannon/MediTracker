@@ -9,6 +9,7 @@ import SubmitVitals from './pages/SubmitVitals';
 import Notifications from './pages/Notifications';
 import Appointments from './pages/Appointments';
 import IssuePrescription from './pages/IssuePrescription';
+import Prescriptions from './pages/Prescriptions';
 
 export default function App() {
   return (
@@ -69,6 +70,14 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <IssuePrescription />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/prescriptions"
+            element={
+              <ProtectedRoute>
+                <Prescriptions />
               </ProtectedRoute>
             }
           />
