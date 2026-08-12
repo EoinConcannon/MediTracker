@@ -11,6 +11,8 @@ import Appointments from './pages/Appointments';
 import IssuePrescription from './pages/IssuePrescription';
 import Prescriptions from './pages/Prescriptions';
 import VitalHistory from './pages/VitalHistory';
+import MyPatients from './pages/MyPatients';
+import DoctorAppointments from './pages/DoctorAppointments';
 
 export default function App() {
   return (
@@ -87,6 +89,22 @@ export default function App() {
             element={
               <ProtectedRoute>
                 <VitalHistory />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-patients"
+            element={
+              <ProtectedRoute>
+                <MyPatients />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/doctor-appointments"
+            element={
+              <ProtectedRoute>
+                <DoctorAppointments />
               </ProtectedRoute>
             }
           />

@@ -3,13 +3,29 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
-import { NOTIFICATION_SERVICE_URL } from '../config';
+import { NOTIFICATION_SERVICE_URL, APPOINTMENT_SERVICE_URL } from '../config';
 
 export default function DoctorDashboard() {
     const { user } = useAuth();
     const navigate = useNavigate();
     const [unreadNotifications, setUnreadNotifications] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [pendingCount, setPendingCount] = useState(0);
+
+    useEffect(() => {
+        const fetchPending = async () => {
+            try {
+                const response = await axios.get(
+                    `${APPOINTMENT_SERVICE_URL}/api/appointments/pending`,
+                    { params: { doctorId: user.id } }
+                );
+                setPendingCount(response.data.length);
+            } catch (err) {
+                console.error('Failed to fetch pending appointments', err);
+            }
+        };
+        fetchPending();
+    }, [user.id]);
 
     useEffect(() => {
         const fetchUnread = async () => {
@@ -106,6 +122,43 @@ export default function DoctorDashboard() {
                                     className="btn btn-primary"
                                     onClick={() => navigate('/issue-prescription')}>
                                     Issue Prescription
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-4 mb-3">
+                        <div className="card h-100 shadow-sm">
+                            <div className="card-body">
+                                <h5 className="card-title">My Patients</h5>
+                                <p className="card-text text-muted">
+                                    View and search all assigned patients
+                                </p>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => navigate('/my-patients')}>
+                                    View Patients
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="col-md-4 mb-3">
+                        <div className="card h-100 shadow-sm">
+                            <div className="card-body">
+                                <h5 className="card-title">
+                                    Appointments
+                                    {pendingCount > 0 && (
+                                        <span className="badge bg-warning text-dark ms-2">
+                                            {pendingCount}
+                                        </span>
+                                    )}
+                                </h5>
+                                <p className="card-text text-muted">
+                                    Confirm or manage patient appointments
+                                </p>
+                                <button
+                                    className="btn btn-primary"
+                                    onClick={() => navigate('/doctor-appointments')}>
+                                    View Appointments
                                 </button>
                             </div>
                         </div>

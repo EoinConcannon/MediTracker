@@ -90,6 +90,20 @@ export default function Navbar() {
                                     onClick={() => navigate('/issue-prescription')}>
                                     Prescriptions
                                 </span>
+                                <span
+                                    className={`nav-link ${isActive('/my-patients')
+                                        ? 'active fw-bold' : ''}`}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate('/my-patients')}>
+                                    Patients
+                                </span>
+                                <span
+                                    className={`nav-link ${isActive('/doctor-appointments')
+                                        ? 'active fw-bold' : ''}`}
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate('/doctor-appointments')}>
+                                    Appointments
+                                </span>
                             </>
                         )}
                     </div>
