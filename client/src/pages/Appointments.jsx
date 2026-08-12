@@ -88,6 +88,7 @@ export default function Appointments() {
 
     const statusBadge = (status) => {
         const colours = {
+            PENDING: 'bg-warning text-dark',
             SCHEDULED: 'bg-success',
             COMPLETED: 'bg-secondary',
             CANCELLED: 'bg-danger',
@@ -275,15 +276,14 @@ export default function Appointments() {
                                         {statusBadge(appointment.status)}
                                     </div>
                                 </div>
-                                {appointment.status === 'SCHEDULED' && (
-                                    <button
-                                        className="btn btn-outline-danger btn-sm"
-                                        onClick={() =>
-                                            handleCancel(appointment.id)
-                                        }>
-                                        Cancel
-                                    </button>
-                                )}
+                                {(appointment.status === 'SCHEDULED' ||
+                                    appointment.status === 'PENDING') && (
+                                        <button
+                                            className="btn btn-outline-danger btn-sm"
+                                            onClick={() => handleCancel(appointment.id)}>
+                                            Cancel
+                                        </button>
+                                    )}
                             </div>
                         </div>
                     </div>
