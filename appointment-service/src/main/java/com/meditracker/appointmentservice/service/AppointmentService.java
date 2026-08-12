@@ -36,7 +36,7 @@ public class AppointmentService {
 					throw new AppointmentConflictException("You already have an appointment at this date and time");
 				});
 
-		appointment.setStatus(AppointmentStatus.SCHEDULED);
+		appointment.setStatus(AppointmentStatus.PENDING);
 		return appointmentRepository.save(appointment);
 	}
 
@@ -51,6 +51,22 @@ public class AppointmentService {
 	public List<Appointment> getUpcomingAppointmentsByPatient(Long patientId) {
 		return appointmentRepository.findByPatientIdAndStatus(patientId, AppointmentStatus.SCHEDULED).stream()
 				.filter(a -> !a.getDate().isBefore(LocalDate.now())).toList();
+	}
+
+	public List<Appointment> getPendingAppointmentsByDoctor(Long doctorId) {
+		return appointmentRepository.findByDoctorIdAndStatus(doctorId, AppointmentStatus.PENDING);
+	}
+
+	public Appointment confirmAppointment(Long id) {
+		Appointment appointment = appointmentRepository.findById(id)
+				.orElseThrow(() -> new ResourceNotFoundException("Appointment not found with id: " + id));
+
+		if (appointment.getStatus() != AppointmentStatus.PENDING) {
+			throw new IllegalArgumentException("Only pending appointments can be confirmed");
+		}
+
+		appointment.setStatus(AppointmentStatus.SCHEDULED);
+		return appointmentRepository.save(appointment);
 	}
 
 	public Appointment cancelAppointment(Long id) {

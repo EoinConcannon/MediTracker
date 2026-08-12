@@ -45,4 +45,16 @@ public class AppointmentController {
 	public ResponseEntity<Appointment> cancelAppointment(@PathVariable Long id) {
 		return ResponseEntity.ok(appointmentService.cancelAppointment(id));
 	}
+
+	// PATCH /api/appointments/{id}/confirm
+	@PatchMapping("/{id}/confirm")
+	public ResponseEntity<Appointment> confirmAppointment(@PathVariable Long id) {
+		return ResponseEntity.ok(appointmentService.confirmAppointment(id));
+	}
+
+	// GET /api/appointments/pending?doctorId=1
+	@GetMapping("/pending")
+	public ResponseEntity<List<Appointment>> getPendingAppointments(@RequestParam Long doctorId) {
+		return ResponseEntity.ok(appointmentService.getPendingAppointmentsByDoctor(doctorId));
+	}
 }
