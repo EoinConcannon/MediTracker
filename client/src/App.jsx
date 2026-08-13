@@ -108,6 +108,16 @@ export default function App() {
               </ProtectedRoute>
             }
           />
+          <Route path="*" element={
+            <div className="container mt-5 text-center">
+              <h2>Page not found</h2>
+              <p className="text-muted">The page you are looking for does not exist.</p>
+              <button className="btn btn-primary"
+                onClick={() => window.location.href = '/'}>
+                Go to Login
+              </button>
+            </div>
+          } />
         </Routes>
       </BrowserRouter>
     </AuthProvider>
