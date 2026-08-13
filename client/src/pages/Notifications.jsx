@@ -75,6 +75,29 @@ export default function Notifications() {
                     </div>
                 )}
 
+                {!loading && notifications.length > 0 && (
+                    <div className="d-flex gap-3 mb-4">
+                        <div className="card text-center px-4 py-2 shadow-sm border-danger">
+                            <div className="fw-bold fs-5 text-danger">
+                                {notifications.filter(n => n.status === 'UNREAD').length}
+                            </div>
+                            <div className="text-muted small">Unread</div>
+                        </div>
+                        <div className="card text-center px-4 py-2 shadow-sm border-secondary">
+                            <div className="fw-bold fs-5 text-secondary">
+                                {notifications.filter(n => n.status === 'READ').length}
+                            </div>
+                            <div className="text-muted small">Read</div>
+                        </div>
+                        <div className="card text-center px-4 py-2 shadow-sm border-primary">
+                            <div className="fw-bold fs-5 text-primary">
+                                {notifications.length}
+                            </div>
+                            <div className="text-muted small">Total</div>
+                        </div>
+                    </div>
+                )}
+
                 {notifications.map(notification => (
                     <div
                         key={notification.id}

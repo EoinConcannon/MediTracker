@@ -127,6 +127,32 @@ export default function VitalHistory() {
                     </div>
                 )}
 
+                {!loading && readings.length > 0 && (
+                    <div className="d-flex gap-3 mb-4">
+                        <div className="card text-center px-4 py-2 shadow-sm border-primary">
+                            <div className="fw-bold fs-5 text-primary">
+                                {readings.length}
+                            </div>
+                            <div className="text-muted small">Total Readings</div>
+                        </div>
+                        <div className="card text-center px-4 py-2 shadow-sm border-success">
+                            <div className="fw-bold fs-5 text-success">
+                                {readings.filter(r => !r.alertTriggered).length}
+                            </div>
+                            <div className="text-muted small">Normal</div>
+                        </div>
+                        {alertCount > 0 && (
+                            <div className="card text-center px-4 py-2 shadow-sm
+                            border-danger">
+                                <div className="fw-bold fs-5 text-danger">
+                                    {alertCount}
+                                </div>
+                                <div className="text-muted small">Alerts</div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {!loading && sortedReadings.length > 0 && (
                     <div className="card shadow-sm">
                         <div className="card-body p-0">

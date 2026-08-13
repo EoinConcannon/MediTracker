@@ -84,18 +84,47 @@ export default function Prescriptions() {
                     </div>
                 )}
 
+                {!loading && prescriptions.length > 0 && (
+                    <div className="d-flex gap-3 mb-4">
+                        <div className="card text-center px-4 py-2 shadow-sm border-success">
+                            <div className="fw-bold fs-5 text-success">
+                                {prescriptions.filter(p => p.status === 'ACTIVE').length}
+                            </div>
+                            <div className="text-muted small">Active</div>
+                        </div>
+                        {prescriptions.some(p => p.allergyWarning) && (
+                            <div className="card text-center px-4 py-2 shadow-sm
+                            border-warning">
+                                <div className="fw-bold fs-5 text-warning">
+                                    {prescriptions.filter(p => p.allergyWarning).length}
+                                </div>
+                                <div className="text-muted small">Allergy Warnings</div>
+                            </div>
+                        )}
+                    </div>
+                )}
+
                 {prescriptions.map(prescription => (
-                    <div key={prescription.id} className="card mb-3 shadow-sm">
+                    <div key={prescription.id}
+                        className={`card mb-3 shadow-sm position-relative ${prescription.allergyWarning ? 'border-warning' : ''
+                            }`}>
+                        {prescription.allergyWarning && (
+                            <span className="position-absolute top-0 end-0
+                             translate-middle badge rounded-pill bg-warning
+                             text-dark"
+                                style={{ zIndex: 1 }}>
+                                ⚠ Allergy
+                            </span>
+                        )}
                         <div className="card-body">
                             <div className="d-flex justify-content-between
-                                            align-items-start">
+                            align-items-start">
                                 <div>
                                     <h5 className="mb-1 fw-bold">
                                         {prescription.drugName}
                                     </h5>
                                     <p className="mb-1 text-muted">
-                                        {prescription.dosage} —{' '}
-                                        {prescription.frequency}
+                                        {prescription.dosage} — {prescription.frequency}
                                     </p>
                                     <small className="text-muted">
                                         Started: {formatDate(prescription.startDate)}
@@ -103,14 +132,6 @@ export default function Prescriptions() {
                                             <> · Ends: {formatDate(prescription.endDate)}</>
                                         )}
                                     </small>
-                                    {prescription.allergyWarning && (
-                                        <div className="mt-2">
-                                            <span className="badge bg-warning
-                                                             text-dark">
-                                                ⚠ Allergy Warning
-                                            </span>
-                                        </div>
-                                    )}
                                 </div>
                                 <div>
                                     {statusBadge(prescription.status)}

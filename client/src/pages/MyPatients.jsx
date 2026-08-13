@@ -71,6 +71,28 @@ export default function MyPatients() {
                     </div>
                 )}
 
+                {!loading && patients.length > 0 && (
+                    <div className="d-flex gap-3 mb-4">
+                        <div className="card text-center px-4 py-2 shadow-sm border-primary">
+                            <div className="fw-bold fs-5 text-primary">
+                                {patients.length}
+                            </div>
+                            <div className="text-muted small">Total Patients</div>
+                        </div>
+                        {patients.some(p =>
+                            p.allergies && p.allergies !== 'None') && (
+                                <div className="card text-center px-4 py-2 shadow-sm
+                            border-warning">
+                                    <div className="fw-bold fs-5 text-warning">
+                                        {patients.filter(p =>
+                                            p.allergies && p.allergies !== 'None').length}
+                                    </div>
+                                    <div className="text-muted small">Have Allergies</div>
+                                </div>
+                            )}
+                    </div>
+                )}
+
                 <div className="row">
                     {filtered.map(patient => (
                         <div key={patient.id} className="col-md-6 mb-3">
