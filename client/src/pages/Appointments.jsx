@@ -3,6 +3,7 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { APPOINTMENT_SERVICE_URL } from '../config';
+import { formatDate } from '../utils/dateUtils';
 
 export default function Appointments() {
     const { user } = useAuth();
@@ -265,7 +266,7 @@ export default function Appointments() {
                                             align-items-start">
                                 <div>
                                     <h5 className="mb-1">
-                                        {appointment.date} at {appointment.time}
+                                        {formatDate(appointment.date)} at {appointment.time.slice(0, 5)}
                                     </h5>
                                     {appointment.notes && (
                                         <p className="text-muted mb-1">

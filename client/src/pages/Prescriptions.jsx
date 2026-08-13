@@ -3,6 +3,7 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { MEDICATION_SERVICE_URL } from '../config';
+import { formatDate } from '../utils/dateUtils';
 
 export default function Prescriptions() {
     const { user } = useAuth();
@@ -97,9 +98,9 @@ export default function Prescriptions() {
                                         {prescription.frequency}
                                     </p>
                                     <small className="text-muted">
-                                        Started: {prescription.startDate}
+                                        Started: {formatDate(prescription.startDate)}
                                         {prescription.endDate && (
-                                            <> · Ends: {prescription.endDate}</>
+                                            <> · Ends: {formatDate(prescription.endDate)}</>
                                         )}
                                     </small>
                                     {prescription.allergyWarning && (

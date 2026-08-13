@@ -4,6 +4,7 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { PATIENT_SERVICE_URL, VITALS_SERVICE_URL } from '../config';
+import { formatDate, formatDateTime } from '../utils/dateUtils';
 
 export default function PatientProfile() {
     const { id } = useParams();
@@ -88,7 +89,7 @@ export default function PatientProfile() {
                             <div className="card-body">
                                 <div className="row mb-2">
                                     <div className="col-4 fw-bold">Date of Birth</div>
-                                    <div className="col-8">{patient.dateOfBirth}</div>
+                                    <div className="col-8">{formatDate(patient.dateOfBirth)}</div>
                                 </div>
                                 <div className="row mb-2">
                                     <div className="col-4 fw-bold">Email</div>
@@ -165,8 +166,7 @@ export default function PatientProfile() {
                                                             {formatReading(vital)}
                                                         </td>
                                                         <td>
-                                                            {new Date(vital.timestamp)
-                                                                .toLocaleString()}
+                                                            {formatDateTime(vital.timestamp)}
                                                         </td>
                                                         <td>
                                                             {vital.alertTriggered ? (

@@ -3,6 +3,7 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { VITALS_SERVICE_URL } from '../config';
+import { formatDateTime } from '../utils/dateUtils';
 
 export default function VitalHistory() {
     const { user } = useAuth();
@@ -99,8 +100,8 @@ export default function VitalHistory() {
                         <button
                             key={type}
                             className={`btn btn-sm ${filter === type
-                                    ? 'btn-primary'
-                                    : 'btn-outline-primary'
+                                ? 'btn-primary'
+                                : 'btn-outline-primary'
                                 }`}
                             onClick={() => setFilter(type)}>
                             {type === 'ALL'
@@ -150,8 +151,7 @@ export default function VitalHistory() {
                                                 {formatReading(reading)}
                                             </td>
                                             <td className="text-muted">
-                                                {new Date(reading.timestamp)
-                                                    .toLocaleString()}
+                                                {formatDateTime(reading.timestamp)}
                                             </td>
                                             <td>
                                                 {reading.alertTriggered ? (

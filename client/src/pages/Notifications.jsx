@@ -3,6 +3,7 @@ import axios from 'axios';
 import Navbar from '../components/Navbar';
 import { useAuth } from '../context/AuthContext';
 import { NOTIFICATION_SERVICE_URL } from '../config';
+import { formatDateTime } from '../utils/dateUtils';
 
 export default function Notifications() {
     const { user } = useAuth();
@@ -78,8 +79,8 @@ export default function Notifications() {
                     <div
                         key={notification.id}
                         className={`card mb-3 shadow-sm ${notification.status === 'UNREAD'
-                                ? 'border-danger'
-                                : 'border-secondary'
+                            ? 'border-danger'
+                            : 'border-secondary'
                             }`}
                         style={{
                             borderLeftWidth: '4px',
@@ -90,8 +91,8 @@ export default function Notifications() {
                                             align-items-start">
                                 <div>
                                     <h5 className={`card-title mb-1 ${notification.status === 'UNREAD'
-                                            ? 'fw-bold'
-                                            : 'text-muted'
+                                        ? 'fw-bold'
+                                        : 'text-muted'
                                         }`}>
                                         {notification.patientName}
                                     </h5>
@@ -99,15 +100,14 @@ export default function Notifications() {
                                         {notification.message}
                                     </p>
                                     <small className="text-muted">
-                                        {new Date(notification.timestamp)
-                                            .toLocaleString()}
+                                        {formatDateTime(notification.timestamp)}
                                     </small>
                                 </div>
                                 <div className="d-flex flex-column
                                                 align-items-end gap-2">
                                     <span className={`badge ${notification.status === 'UNREAD'
-                                            ? 'bg-danger'
-                                            : 'bg-secondary'
+                                        ? 'bg-danger'
+                                        : 'bg-secondary'
                                         }`}>
                                         {notification.status}
                                     </span>
