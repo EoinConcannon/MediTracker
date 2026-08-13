@@ -52,9 +52,10 @@ export default function IssuePrescription() {
             );
             setResult(response.data);
         } catch (err) {
-            if (err.response?.data) {
-                const data = err.response.data;
-                setError(data.error || JSON.stringify(data));
+            if (err.response?.data?.error) {
+                setError(err.response.data.error);
+            } else if (err.response?.data) {
+                setError(JSON.stringify(err.response.data));
             } else {
                 setError('Failed to issue prescription');
             }

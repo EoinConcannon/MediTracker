@@ -22,6 +22,11 @@ public class PrescriptionService {
 
 	public Prescription issuePrescription(Prescription prescription) {
 
+		// Validate end date is not before start date
+		if (prescription.getEndDate() != null && prescription.getEndDate().isBefore(prescription.getStartDate())) {
+			throw new IllegalArgumentException("End date cannot be before start date");
+		}
+
 		// Check allergies directly — no inter-service call needed anymore
 		Optional<Patient> patientOpt = patientRepository.findById(prescription.getPatientId());
 
