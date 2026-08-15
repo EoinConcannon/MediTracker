@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -29,35 +30,34 @@ public class AppointmentServiceTest {
 	@InjectMocks
 	private AppointmentService appointmentService;
 
-	// Helper to build a valid future appointment
 	private Appointment buildAppointment() {
 		Appointment appointment = new Appointment();
+		appointment.setId(1L);
 		appointment.setPatientId(1L);
 		appointment.setDoctorId(1L);
 		appointment.setDate(LocalDate.now().plusDays(7));
 		appointment.setTime(LocalTime.of(10, 0));
 		appointment.setNotes("General check-up");
+		appointment.setStatus(AppointmentStatus.PENDING);
 		return appointment;
 	}
 
 	// ─── bookAppointment ────────────────────────────────────────────────────
 
 	@Test
-	void bookAppointment_Success() {
+	void bookAppointment_Success_ReturnsPending() {
 		Appointment appointment = buildAppointment();
 
 		when(appointmentRepository.findByDoctorIdAndDateAndTimeAndStatusNot(anyLong(), any(), any(), any()))
 				.thenReturn(Optional.empty());
-
 		when(appointmentRepository.findByPatientIdAndDateAndTimeAndStatusNot(anyLong(), any(), any(), any()))
 				.thenReturn(Optional.empty());
-
 		when(appointmentRepository.save(appointment)).thenReturn(appointment);
 
 		Appointment result = appointmentService.bookAppointment(appointment);
 
 		assertNotNull(result);
-		assertEquals(AppointmentStatus.SCHEDULED, result.getStatus());
+		assertEquals(AppointmentStatus.PENDING, result.getStatus());
 		verify(appointmentRepository, times(1)).save(appointment);
 	}
 
@@ -95,7 +95,6 @@ public class AppointmentServiceTest {
 
 		when(appointmentRepository.findByDoctorIdAndDateAndTimeAndStatusNot(anyLong(), any(), any(), any()))
 				.thenReturn(Optional.empty());
-
 		when(appointmentRepository.findByPatientIdAndDateAndTimeAndStatusNot(anyLong(), any(), any(), any()))
 				.thenReturn(Optional.of(existing));
 
@@ -113,16 +112,51 @@ public class AppointmentServiceTest {
 
 		when(appointmentRepository.findByDoctorIdAndDateAndTimeAndStatusNot(anyLong(), any(), any(), any()))
 				.thenReturn(Optional.empty());
-
 		when(appointmentRepository.findByPatientIdAndDateAndTimeAndStatusNot(anyLong(), any(), any(), any()))
 				.thenReturn(Optional.empty());
-
 		when(appointmentRepository.save(appointment)).thenReturn(appointment);
 
 		Appointment result = appointmentService.bookAppointment(appointment);
 
 		assertNotNull(result);
+		assertEquals(AppointmentStatus.PENDING, result.getStatus());
+	}
+
+	// ─── confirmAppointment ──────────────────────────────────────────────────
+
+	@Test
+	void confirmAppointment_Success_SetsScheduled() {
+		Appointment appointment = buildAppointment();
+		appointment.setStatus(AppointmentStatus.PENDING);
+
+		when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+		when(appointmentRepository.save(appointment)).thenReturn(appointment);
+
+		Appointment result = appointmentService.confirmAppointment(1L);
+
 		assertEquals(AppointmentStatus.SCHEDULED, result.getStatus());
+		verify(appointmentRepository, times(1)).save(appointment);
+	}
+
+	@Test
+	void confirmAppointment_NotPending_ThrowsIllegalArgument() {
+		Appointment appointment = buildAppointment();
+		appointment.setStatus(AppointmentStatus.SCHEDULED);
+
+		when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+
+		IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
+				() -> appointmentService.confirmAppointment(1L));
+
+		assertEquals("Only pending appointments can be confirmed", ex.getMessage());
+		verify(appointmentRepository, never()).save(any());
+	}
+
+	@Test
+	void confirmAppointment_NotFound_ThrowsResourceNotFound() {
+		when(appointmentRepository.findById(999L)).thenReturn(Optional.empty());
+
+		assertThrows(ResourceNotFoundException.class, () -> appointmentService.confirmAppointment(999L));
 	}
 
 	// ─── cancelAppointment ──────────────────────────────────────────────────
@@ -130,11 +164,9 @@ public class AppointmentServiceTest {
 	@Test
 	void cancelAppointment_Success() {
 		Appointment appointment = buildAppointment();
-		appointment.setId(1L);
 		appointment.setStatus(AppointmentStatus.SCHEDULED);
 
 		when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
-
 		when(appointmentRepository.save(appointment)).thenReturn(appointment);
 
 		Appointment result = appointmentService.cancelAppointment(1L);
@@ -144,19 +176,21 @@ public class AppointmentServiceTest {
 	}
 
 	@Test
-	void cancelAppointment_NotFound_ThrowsResourceNotFound() {
-		when(appointmentRepository.findById(999L)).thenReturn(Optional.empty());
+	void cancelAppointment_CancelPending_Success() {
+		Appointment appointment = buildAppointment();
+		appointment.setStatus(AppointmentStatus.PENDING);
 
-		ResourceNotFoundException ex = assertThrows(ResourceNotFoundException.class,
-				() -> appointmentService.cancelAppointment(999L));
+		when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
+		when(appointmentRepository.save(appointment)).thenReturn(appointment);
 
-		assertEquals("Appointment not found with id: 999", ex.getMessage());
+		Appointment result = appointmentService.cancelAppointment(1L);
+
+		assertEquals(AppointmentStatus.CANCELLED, result.getStatus());
 	}
 
 	@Test
 	void cancelAppointment_AlreadyCompleted_ThrowsIllegalArgument() {
 		Appointment appointment = buildAppointment();
-		appointment.setId(1L);
 		appointment.setStatus(AppointmentStatus.COMPLETED);
 
 		when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
@@ -171,7 +205,6 @@ public class AppointmentServiceTest {
 	@Test
 	void cancelAppointment_AlreadyCancelled_ThrowsIllegalArgument() {
 		Appointment appointment = buildAppointment();
-		appointment.setId(1L);
 		appointment.setStatus(AppointmentStatus.CANCELLED);
 
 		when(appointmentRepository.findById(1L)).thenReturn(Optional.of(appointment));
@@ -183,13 +216,20 @@ public class AppointmentServiceTest {
 		verify(appointmentRepository, never()).save(any());
 	}
 
+	@Test
+	void cancelAppointment_NotFound_ThrowsResourceNotFound() {
+		when(appointmentRepository.findById(999L)).thenReturn(Optional.empty());
+
+		assertThrows(ResourceNotFoundException.class, () -> appointmentService.cancelAppointment(999L));
+	}
+
 	// ─── getAppointmentsByPatient ────────────────────────────────────────────
 
 	@Test
-	void getAppointmentsByPatient_ReturnsCorrectList() {
+	void getAppointmentsByPatient_ReturnsList() {
 		Appointment a1 = buildAppointment();
 		Appointment a2 = buildAppointment();
-		a2.setDate(LocalDate.now().plusDays(14));
+		a2.setId(2L);
 
 		when(appointmentRepository.findByPatientId(1L)).thenReturn(List.of(a1, a2));
 
@@ -200,7 +240,7 @@ public class AppointmentServiceTest {
 	}
 
 	@Test
-	void getAppointmentsByPatient_NoAppointments_ReturnsEmptyList() {
+	void getAppointmentsByPatient_NoAppointments_ReturnsEmpty() {
 		when(appointmentRepository.findByPatientId(99L)).thenReturn(List.of());
 
 		List<Appointment> result = appointmentService.getAppointmentsByPatient(99L);
@@ -211,15 +251,39 @@ public class AppointmentServiceTest {
 	// ─── getAppointmentsByDoctor ─────────────────────────────────────────────
 
 	@Test
-	void getAppointmentsByDoctor_ReturnsCorrectList() {
-		Appointment a1 = buildAppointment();
+	void getAppointmentsByDoctor_ReturnsList() {
+		Appointment appointment = buildAppointment();
 
-		when(appointmentRepository.findByDoctorId(1L)).thenReturn(List.of(a1));
+		when(appointmentRepository.findByDoctorId(1L)).thenReturn(List.of(appointment));
 
 		List<Appointment> result = appointmentService.getAppointmentsByDoctor(1L);
 
 		assertEquals(1, result.size());
 		verify(appointmentRepository, times(1)).findByDoctorId(1L);
+	}
+
+	// ─── getPendingAppointmentsByDoctor ──────────────────────────────────────
+
+	@Test
+	void getPendingAppointmentsByDoctor_ReturnsPendingOnly() {
+		Appointment pending = buildAppointment();
+		pending.setStatus(AppointmentStatus.PENDING);
+
+		when(appointmentRepository.findByDoctorIdAndStatus(1L, AppointmentStatus.PENDING)).thenReturn(List.of(pending));
+
+		List<Appointment> result = appointmentService.getPendingAppointmentsByDoctor(1L);
+
+		assertEquals(1, result.size());
+		assertEquals(AppointmentStatus.PENDING, result.get(0).getStatus());
+	}
+
+	@Test
+	void getPendingAppointmentsByDoctor_NoPending_ReturnsEmpty() {
+		when(appointmentRepository.findByDoctorIdAndStatus(1L, AppointmentStatus.PENDING)).thenReturn(List.of());
+
+		List<Appointment> result = appointmentService.getPendingAppointmentsByDoctor(1L);
+
+		assertTrue(result.isEmpty());
 	}
 
 	// ─── getUpcomingAppointmentsByPatient ────────────────────────────────────
