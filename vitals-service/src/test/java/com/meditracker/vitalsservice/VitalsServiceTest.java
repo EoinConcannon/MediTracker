@@ -182,9 +182,9 @@ public class VitalsServiceTest {
 		VitalReading reading = buildHeartRateReading();
 		reading.setValue(115.0);
 
+		lenient().when(thresholdService.formatReadingValue(reading)).thenReturn("115.0 BPM");
+		lenient().when(thresholdService.getSafeRange(VitalType.HEART_RATE)).thenReturn("60-100 BPM");
 		when(thresholdService.isAbnormal(reading)).thenReturn(true);
-		when(thresholdService.formatReadingValue(reading)).thenReturn("115.0 BPM");
-		when(thresholdService.getSafeRange(VitalType.HEART_RATE)).thenReturn("60-100 BPM");
 		when(vitalReadingRepository.save(reading)).thenReturn(reading);
 		when(patientServiceClient.getPatient(1L)).thenThrow(new RuntimeException("Patient service unavailable"));
 
