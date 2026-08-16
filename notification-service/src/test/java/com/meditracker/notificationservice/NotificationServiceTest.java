@@ -1,5 +1,6 @@
 package com.meditracker.notificationservice;
 
+import com.meditracker.notificationservice.exception.NotificationNotFoundException;
 import com.meditracker.notificationservice.model.Notification;
 import com.meditracker.notificationservice.model.NotificationStatus;
 import com.meditracker.notificationservice.repository.NotificationRepository;
@@ -166,10 +167,11 @@ public class NotificationServiceTest {
 	}
 
 	@Test
-	void markAsRead_NotFound_ThrowsRuntimeException() {
+	void markAsRead_NotFound_ThrowsNotificationNotFoundException() {
 		when(notificationRepository.findById(999L)).thenReturn(Optional.empty());
 
-		RuntimeException ex = assertThrows(RuntimeException.class, () -> notificationService.markAsRead(999L));
+		NotificationNotFoundException ex = assertThrows(NotificationNotFoundException.class,
+				() -> notificationService.markAsRead(999L));
 
 		assertEquals("Notification not found with id: 999", ex.getMessage());
 		verify(notificationRepository, never()).save(any());

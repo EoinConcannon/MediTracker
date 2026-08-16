@@ -2,6 +2,7 @@ package com.meditracker.notificationservice;
 
 import tools.jackson.databind.ObjectMapper;
 import com.meditracker.notificationservice.dto.VitalAlertEvent;
+import com.meditracker.notificationservice.exception.NotificationNotFoundException;
 import com.meditracker.notificationservice.model.Notification;
 import com.meditracker.notificationservice.model.NotificationStatus;
 import com.meditracker.notificationservice.service.NotificationService;
@@ -133,11 +134,11 @@ public class NotificationControllerIntegrationTest {
 	}
 
 	@Test
-	void markAsRead_NotFound_Returns500() throws Exception {
-		when(notificationService.markAsRead(999L))
-				.thenThrow(new RuntimeException("Notification not found with id: 999"));
+	void markAsRead_NotFound_Returns404() throws Exception {
+		when(notificationService.markAsRead(999L)).thenThrow(new NotificationNotFoundException(999L));
 
-		mockMvc.perform(patch("/api/notifications/999/read")).andExpect(status().isInternalServerError());
+		mockMvc.perform(patch("/api/notifications/999/read")).andExpect(status().isNotFound())
+				.andExpect(jsonPath("$.error").value("Notification not found with id: 999"));
 	}
 
 	// ─── POST /api/notifications/alert ──────────────────────────────────────

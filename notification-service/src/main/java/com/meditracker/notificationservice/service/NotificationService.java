@@ -1,5 +1,6 @@
 package com.meditracker.notificationservice.service;
 
+import com.meditracker.notificationservice.exception.NotificationNotFoundException;
 import com.meditracker.notificationservice.model.Notification;
 import com.meditracker.notificationservice.model.NotificationStatus;
 import com.meditracker.notificationservice.repository.NotificationRepository;
@@ -28,7 +29,7 @@ public class NotificationService {
 
 	public Notification markAsRead(Long notificationId) {
 		Notification notification = notificationRepository.findById(notificationId)
-				.orElseThrow(() -> new RuntimeException("Notification not found with id: " + notificationId));
+				.orElseThrow(() -> new NotificationNotFoundException(notificationId));
 		notification.setStatus(NotificationStatus.READ);
 		return notificationRepository.save(notification);
 	}
