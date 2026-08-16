@@ -3,6 +3,8 @@ package com.meditracker.vitalsservice;
 import tools.jackson.databind.ObjectMapper;
 import com.meditracker.vitalsservice.model.VitalReading;
 import com.meditracker.vitalsservice.model.VitalType;
+import com.meditracker.vitalsservice.service.NotificationServiceClient;
+import com.meditracker.vitalsservice.service.PatientServiceClient;
 import com.meditracker.vitalsservice.service.VitalsService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,12 @@ public class VitalsControllerIntegrationTest {
 
 	@MockitoBean
 	private VitalsService vitalsService;
+
+	@MockitoBean
+	private PatientServiceClient patientServiceClient;
+
+	@MockitoBean
+	private NotificationServiceClient notificationServiceClient;
 
 	private VitalReading buildBloodPressureReading(boolean alert) {
 		VitalReading reading = new VitalReading();
