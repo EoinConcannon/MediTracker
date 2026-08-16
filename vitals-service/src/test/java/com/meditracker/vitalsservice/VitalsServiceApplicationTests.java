@@ -4,13 +4,12 @@ import com.meditracker.vitalsservice.service.NotificationServiceClient;
 import com.meditracker.vitalsservice.service.PatientServiceClient;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.RestTemplate;
 
 @SpringBootTest
 @ActiveProfiles("test")
-@Import(TestConfig.class)
 class VitalsServiceApplicationTests {
 
 	@MockitoBean
@@ -18,6 +17,9 @@ class VitalsServiceApplicationTests {
 
 	@MockitoBean
 	private NotificationServiceClient notificationServiceClient;
+
+	@MockitoBean
+	private RestTemplate restTemplate;
 
 	@Test
 	void contextLoads() {
