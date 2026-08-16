@@ -12,20 +12,22 @@ doctor. The system also supports appointment booking and prescription management
 MediTracker is built using a microservices architecture. Each service is independently 
 deployed, has its own MySQL database, and communicates with other services via REST APIs.
 
+```text
 Client (React)
 │
 ├── REST → patient-service (port 8081)
-│ └── patient_db (MySQL)
+│   └── patient_db (MySQL)
 │
 ├── REST → appointment-service (port 8082)
-│ └── appointment_db (MySQL)
+│   └── appointment_db (MySQL)
 │
 ├── REST → vitals-service (port 8084)
-│ └── vitals_db (MySQL)
-│ └── REST → notification-service (on abnormal reading)
+│   ├── vitals_db (MySQL)
+│   └── REST → notification-service (on abnormal reading)
 │
 └── REST → notification-service (port 8085)
-└── notification_db (MySQL)
+    └── notification_db (MySQL)
+```
 
 Prescriptions are managed within the patient-service alongside doctor and patient records.
 
@@ -230,22 +232,26 @@ POST http://localhost:8084/api/vitals
 ```
 
 **Check doctor notifications:**
-
+```http
 GET http://localhost:8085/api/notifications?doctorId=1
+```
 
 ---
 
 ## Project Structure
 
+```text
 meditracker/
-patient-service/ # Doctor, patient and prescription management (port 8081)
-appointment-service/ # Appointment booking and confirmation (port 8082)
-vitals-service/ # Vital readings and alert triggering (port 8084)
-notification-service/ # Alert storage and doctor notifications (port 8085)
-client/ # React frontend (port 5173 dev / 3000 Docker)
-docker-compose.yml # All services and databases
-.github/workflows/ # GitHub Actions CI pipeline
-README.md
+├── patient-service/          # Doctor, patient and prescription management (port 8081)
+├── appointment-service/      # Appointment booking and confirmation (port 8082)
+├── vitals-service/           # Vital readings and alert triggering (port 8084)
+├── notification-service/     # Alert storage and doctor notifications (port 8085)
+├── client/                   # React frontend (port 5173 dev / 3000 Docker)
+├── docker-compose.yml        # All services and databases
+├── .github/
+│   └── workflows/            # GitHub Actions CI pipeline
+└── README.md
+```
 
 ---
 
@@ -259,4 +265,4 @@ Results are visible in the Actions tab of the repository.
 
 ## Author
 
-Eoin — Final Year Project 2026
+Eoin - Final Year Project 2026
